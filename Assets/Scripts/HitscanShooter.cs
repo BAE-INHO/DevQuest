@@ -10,29 +10,30 @@ public class HitscanShooter : MonoBehaviour
     [SerializeField] private LayerMask hitMask = ~0;
     [SerializeField] private int damage = 10;
 
-    private PlayerControls controls;
+    private int lastShotFrame = -1;
 
     void Reset()
     {
         aim = FindFirstObjectByType<AimRayProvider>();
     }
 
-    void Awake()
+    public void OnFire(InputAction.CallbackContext ctx)
     {
-        controls = new PlayerControls();
-        controls.Player.Fire.performed += OnFire;
-    }
+        if (!ctx.performed) return;
 
-    void OnEnable() => controls.Enable();
-    void OnDisable() => controls.Disable();
+        if (lastShotFrame == Time.frameCount) return;
+        lastShotFrame = Time.frameCount;
 
-    public void OnFire(InputAction.CallbackContext _)
-    {
+        if (aim == null) return;
+
         Ray ray = aim.GetRayFromCursor();
         if (Physics.Raycast(ray, out RaycastHit hit, maxDistance, hitMask))
         {
             var hp = hit.collider.GetComponent<Health>();
-            if (hp != null) hp.TakeDamage(damage);
+            if (hp != null)
+            {
+                hp.TakeDamage(damage);
+            }
         }
     }
 }

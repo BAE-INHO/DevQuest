@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class Health : MonoBehaviour
 {
-    public int maxHP = 10;
+    public int maxHP = 30;
     int hp;
 
     void Awake() => hp = maxHP;
@@ -15,6 +15,10 @@ public class Health : MonoBehaviour
 
     void Die()
     {
+        if (CompareTag("Enemy") && GameManager.Instance != null)
+        {
+            GameManager.Instance.OnEnemyDied();
+        }
         Destroy(gameObject);
     }
 }
